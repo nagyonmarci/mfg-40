@@ -111,16 +111,24 @@ await tryOrSkip('files alias mező', () => api('/fields/bekuldesek', 'POST', {
   }
 }, token));
 
-// 6. Jogosultságok
+// 6. Jogosultságok (Directus 11: policy-alapú)
 console.log('Jogosultságok...');
-for (const [collection, action] of [
-  ['bekuldesek',       'create'],
-  ['bekuldesek_files', 'create'],
-  ['directus_files',   'create']
-]) {
-  await tryOrSkip(`${collection} ${action}`, () =>
-    api('/permissions', 'POST', { role: null, collection, action, fields: ['*'] }, token)
-  );
+// Public policy ID lekérése
+const policiesRes = await api('/policies?filter[name][_eq]=Public&limit=1', 'GET', null, token);
+const publicPolicyId = policiesRes.data?.[0]?.id;
+if (!publicPolicyId) {
+  console.log('  ⚠ Public policy nem található — jogosultságokat kézzel kell beállítani az adminban');
+} else {
+  console.log(`  ✓ Public policy ID: ${publicPolicyId}`);
+  for (const [collection, action] of [
+    ['bekuldesek',       'create'],
+    ['bekuldesek_files', 'create'],
+    ['directus_files',   'create']
+  ]) {
+    await tryOrSkip(`${collection} ${action}`, () =>
+      api('/permissions', 'POST', { policy: publicPolicyId, collection, action, fields: ['*'] }, token)
+    );
+  }
 }
 
 console.log('\n✓ Directus setup kész!');
