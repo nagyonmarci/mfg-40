@@ -1,0 +1,101 @@
+services:
+  mfg-db:
+    image: postgres:18.2-alpine
+    container_name: mfg-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-mfg}
+      POSTGRES_USER: ${DB_USER:-mfg}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - mfg_db_data:/var/lib/postgresql/data
+    networks:
+      - mfg_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-mfg} -d ${DB_NAME:-mfg}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mfg-directus:
+    image: directus/directus:11.15.4
+    container_name: mfg-directus
+    restart: unless-stopped
+    depends_on:
+      mfg-db:
+        condition: service_healthy
+    environment:
+      SECRET: ${DIRECTUS_SECRET:?DIRECTUS_SECRET is required}
+      DB_CLIENT: pg
+      DB_HOST: mfg-db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_NAME:-mfg}
+      DB_USER: ${DB_USER:-mfg}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@mfg-art.hu}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      PUBLIC_URL: https://api.mfg-art.hu
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "https://mfg-art.hu"
+    volumes:
+      - mfg_directus_uploads:/directus/uploads
+      - mfg_directus_extensions:/directus/extensions
+    networks:
+      - mfg_internal
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mfg-directus.rule=Host(`api.mfg-art.hu`)"
+      - "traefik.http.routers.mfg-directus.entrypoints=websecure"
+      - "traefik.http.routers.mfg-directus.tls=true"
+      - "traefik.http.routers.mfg-directus.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mfg-directus.loadbalancer.server.port=8055"
+      - "traefik.docker.network=traefik_proxy"
+
+  mfg-astro:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mfg-astro:latest
+    container_name: mfg-astro
+    restart: unless-stopped
+    depends_on:
+      - mfg-directus
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=3000
+      - DIRECTUS_URL=http://mfg-directus:8055
+      - PUBLIC_DIRECTUS_URL=https://api.mfg-art.hu
+      - DIRECTUS_TOKEN=${DIRECTUS_TOKEN:?DIRECTUS_TOKEN is required}
+    networks:
+      - mfg_internal
+      - traefik_proxy
+    labels:
+      - "traefik.enable=true"
+      # HTTP → HTTPS
+      - "traefik.http.routers.mfg-http.rule=Host(`mfg-art.hu`) || Host(`www.mfg-art.hu`)"
+      - "traefik.http.routers.mfg-http.entrypoints=web"
+      - "traefik.http.routers.mfg-http.middlewares=mfg-https-redirect"
+      - "traefik.http.middlewares.mfg-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.mfg-https-redirect.redirectscheme.permanent=true"
+      # HTTPS
+      - "traefik.http.routers.mfg.rule=Host(`mfg-art.hu`) || Host(`www.mfg-art.hu`)"
+      - "traefik.http.routers.mfg.entrypoints=websecure"
+      - "traefik.http.routers.mfg.tls=true"
+      - "traefik.http.routers.mfg.tls.certresolver=letsencrypt"
+      - "traefik.http.services.mfg.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik_proxy"
+
+volumes:
+  mfg_db_data:
+  mfg_directus_uploads:
+  mfg_directus_extensions:
+
+networks:
+  mfg_internal:
+    driver: bridge
+  traefik_proxy:
+    external: true

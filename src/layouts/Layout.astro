@@ -1,0 +1,107 @@
+---
+interface Props { title: string; }
+const { title } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} — Medgyessy Gimnázium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #8B0000;
+      --red-bright: #C0392B;
+      --red-dim: #5a0000;
+      --black: #0a0a0a;
+      --black-card: #161616;
+      --white: #f0ebe3;
+      --white-dim: #b0a898;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.35;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1.8rem 3rem;
+      position: relative;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+    header img { height: 60px; width: auto; }
+    .titles { display: flex; flex-direction: column; }
+    .school-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--red-bright);
+    }
+    .school-sub { font-size: 0.82rem; color: var(--white-dim); letter-spacing: 0.04em; }
+    nav { display: flex; gap: 2rem; margin-left: auto; }
+    nav a {
+      color: var(--white-dim);
+      text-decoration: none;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    nav a:hover, nav a.active { color: var(--red-bright); }
+    main { padding: 3rem; max-width: 1200px; margin: 0 auto; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--white-dim);
+      font-size: 0.78rem;
+      border-top: 1px solid rgba(139,0,0,0.2);
+      letter-spacing: 0.05em;
+    }
+    @media (max-width: 768px) {
+      header { padding: 1.2rem 1.5rem; flex-wrap: wrap; }
+      nav { margin-left: 0; width: 100%; gap: 1.2rem; }
+      main { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="/logo.png" alt="Medgyessy logo" />
+    <div class="titles">
+      <span class="school-name">Medgyessy Ferenc</span>
+      <span class="school-sub">Gimnázium és Művészeti Iskola · Debrecen</span>
+    </div>
+    <nav>
+      <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Feltöltés</a>
+      <a href="/galeria" class={Astro.url.pathname === '/galeria' ? 'active' : ''}>Galéria</a>
+    </nav>
+  </header>
+  <main><slot /></main>
+  <footer>© {new Date().getFullYear()} Medgyessy Ferenc Gimnázium és Művészeti Iskola, Debrecen</footer>
+</body>
+</html>

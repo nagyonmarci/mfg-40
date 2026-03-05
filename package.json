@@ -1,0 +1,15 @@
+{
+  "name": "mfg-40",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node dist/server/entry.mjs"
+  },
+  "dependencies": {
+    "@astrojs/node": "^8.3.0",
+    "astro": "^4.15.0"
+  }
+}

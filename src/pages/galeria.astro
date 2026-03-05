@@ -1,0 +1,128 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://mfg-directus:8055';
+const PUBLIC_DIRECTUS_URL = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://api.mfg-art.hu';
+
+let artworks: any[] = [];
+
+try {
+  const res = await fetch(
+    `${DIRECTUS_URL}/items/artworks?fields=id,title,author,description,image,date_created&sort[]=-date_created&limit=200`
+  );
+  if (res.ok) {
+    const data = await res.json();
+    artworks = data.data || [];
+  }
+} catch (e) {
+  console.error('Galéria fetch hiba:', e);
+}
+
+function imageUrl(id: string) {
+  return `${PUBLIC_DIRECTUS_URL}/assets/${id}?width=600&quality=80`;
+}
+function imageUrlFull(id: string) {
+  return `${PUBLIC_DIRECTUS_URL}/assets/${id}`;
+}
+---
+<Layout title="Galéria">
+  <div class="gallery-page">
+    <div class="page-header">
+      <h1>Galéria</h1>
+      <p>{artworks.length} alkotás</p>
+    </div>
+
+    {artworks.length === 0 ? (
+      <div class="empty">
+        <div class="empty-icon">◈</div>
+        <p>Még nincs feltöltött alkotás.</p>
+        <a href="/" class="btn-red">Első feltöltés</a>
+      </div>
+    ) : (
+      <div class="grid">
+        {artworks.map((art) => (
+          <div class="card" data-full={art.image ? imageUrlFull(art.image) : ''} data-title={art.title} data-author={art.author}>
+            <div class="card-img-wrap">
+              {art.image
+                ? <img src={imageUrl(art.image)} alt={art.title} loading="lazy" />
+                : <div class="no-img">◈</div>
+              }
+            </div>
+            <div class="card-info">
+              <div class="card-title">{art.title}</div>
+              <div class="card-author">{art.author}</div>
+              {art.description && <div class="card-desc">{art.description}</div>}
+              <div class="card-date">{new Date(art.date_created).toLocaleDateString('hu-HU')}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <div id="lightbox" class="lightbox" style="display:none;">
+    <button id="lb-close" class="lb-close">✕</button>
+    <img id="lb-img" src="" alt="" />
+    <div class="lb-info">
+      <div id="lb-title" class="lb-title"></div>
+      <div id="lb-author" class="lb-author"></div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-header { margin-bottom: 2.5rem; display: flex; align-items: baseline; gap: 1.5rem; border-left: 3px solid var(--red); padding-left: 1.5rem; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; line-height: 1.1; }
+  .page-header p { color: var(--white-dim); font-style: italic; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+  .card { background: var(--black-card); border: 1px solid rgba(139,0,0,0.15); overflow: hidden; cursor: pointer; transition: border-color 0.3s, transform 0.3s; }
+  .card:hover { border-color: rgba(139,0,0,0.5); transform: translateY(-3px); }
+  .card-img-wrap { aspect-ratio: 4/3; overflow: hidden; background: #0d0d0d; display: flex; align-items: center; justify-content: center; }
+  .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; }
+  .card:hover .card-img-wrap img { transform: scale(1.05); }
+  .no-img { font-size: 2rem; color: var(--red-dim); }
+  .card-info { padding: 0.9rem 1.1rem; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 0.98rem; font-weight: 700; color: var(--white); margin-bottom: 0.15rem; }
+  .card-author { font-size: 0.83rem; color: var(--red-bright); font-style: italic; margin-bottom: 0.3rem; }
+  .card-desc { font-size: 0.82rem; color: var(--white-dim); line-height: 1.4; margin-bottom: 0.3rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-date { font-size: 0.72rem; color: rgba(176,168,152,0.4); letter-spacing: 0.04em; }
+  .empty { text-align: center; padding: 6rem 2rem; }
+  .empty-icon { font-size: 2.8rem; color: var(--red-dim); margin-bottom: 1rem; }
+  .empty p { color: var(--white-dim); font-style: italic; margin-bottom: 2rem; font-size: 1.05rem; }
+  .btn-red { padding: 0.75rem 1.8rem; background: var(--red); color: var(--white); text-decoration: none; font-family: 'Playfair Display', serif; letter-spacing: 0.1em; font-size: 0.88rem; transition: background 0.3s; }
+  .btn-red:hover { background: var(--red-bright); }
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  #lb-img { max-width: 90vw; max-height: 78vh; object-fit: contain; border: 1px solid rgba(139,0,0,0.3); }
+  .lb-info { text-align: center; margin-top: 1.2rem; }
+  .lb-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--white); }
+  .lb-author { color: var(--red-bright); font-style: italic; margin-top: 0.25rem; }
+  .lb-close { position: fixed; top: 1.2rem; right: 1.2rem; background: none; border: 1px solid rgba(176,168,152,0.3); color: var(--white-dim); width: 2.4rem; height: 2.4rem; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+  .lb-close:hover { color: var(--white); border-color: var(--white-dim); }
+</style>
+
+<script>
+  const cards = document.querySelectorAll('.card');
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lb-img') as HTMLImageElement;
+  const lbTitle = document.getElementById('lb-title');
+  const lbAuthor = document.getElementById('lb-author');
+  const lbClose = document.getElementById('lb-close');
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const full = card.getAttribute('data-full');
+      if (!full) return;
+      lbImg.src = full;
+      lbTitle.textContent = card.getAttribute('data-title') || '';
+      lbAuthor.textContent = card.getAttribute('data-author') || '';
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  function close() { lb.style.display = 'none'; document.body.style.overflow = ''; }
+  lbClose.addEventListener('click', close);
+  lb.addEventListener('click', e => { if (e.target === lb) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+</script>
