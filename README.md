@@ -37,8 +37,11 @@ docker logs mfg-directus --tail 20
 
 ### 4. Directus setup (collection + jogosultságok)
 
+A script a container belsejéből fut, ahol `localhost:8055` elérhető és az env változók (`ADMIN_EMAIL`, `ADMIN_PASSWORD`) már be vannak töltve:
+
 ```bash
-ADMIN_PASSWORD=$(grep ADMIN_PASSWORD .env | cut -d= -f2) bash scripts/setup-directus.sh
+docker cp scripts/setup-directus.sh mfg-directus:/tmp/setup-directus.sh
+docker exec mfg-directus sh /tmp/setup-directus.sh
 ```
 
 ### 5. API Token létrehozása
@@ -87,7 +90,8 @@ A `docker-compose.override.yml` felülírja a production konfigurációt helyi f
 
 ```bash
 docker compose up -d mfg-db mfg-directus
-ADMIN_PASSWORD=$(grep ADMIN_PASSWORD .env | cut -d= -f2) \
-  DIRECTUS_URL=http://localhost:8056 bash scripts/setup-directus.sh
+# Várj ~30mp-et, majd:
+docker cp scripts/setup-directus.sh mfg-directus:/tmp/setup-directus.sh
+docker exec mfg-directus sh /tmp/setup-directus.sh
 DIRECTUS_URL=http://localhost:8056 npm run dev
 ```

@@ -10,12 +10,12 @@
 set -e
 
 DIRECTUS_URL="${DIRECTUS_URL:-http://localhost:8055}"
-EMAIL="${ADMIN_EMAIL:-admin@mfg-art.hu}"
+EMAIL="${ADMIN_EMAIL}"
 PASSWORD="${ADMIN_PASSWORD}"
 
-if [ -z "$PASSWORD" ]; then
-  echo "Hiba: ADMIN_PASSWORD nincs beállítva."
-  echo "Példa: ADMIN_PASSWORD=titkos bash scripts/setup-directus.sh"
+if [ -z "$EMAIL" ] || [ -z "$PASSWORD" ]; then
+  echo "Hiba: ADMIN_EMAIL és ADMIN_PASSWORD szükséges."
+  echo "Példa: docker cp scripts/setup-directus.sh mfg-directus:/tmp/ && docker exec mfg-directus sh /tmp/setup-directus.sh"
   exit 1
 fi
 
