@@ -1,97 +1,196 @@
 ---
 import Layout from '../layouts/Layout.astro';
-const directusUrl = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://api.mfg-art.hu';
 ---
 <Layout title="Feltöltés">
-  <div class="upload-page">
-    <div class="page-header">
-      <h1>Műalkotás feltöltése</h1>
-      <p>Töltsd fel alkotásaidat a gimnázium digitális galériájába.</p>
-    </div>
+  <div class="page-layout">
 
-    <div id="form-wrap">
-      <form id="upload-form">
-        <div class="form-group">
-          <label for="author">Szerző neve</label>
-          <input type="text" id="author" name="author" placeholder="Teljes neved" required />
-        </div>
-        <div class="form-group">
-          <label for="title">Cím</label>
-          <input type="text" id="title" name="title" placeholder="Az alkotás neve" required />
-        </div>
-        <div class="form-group">
-          <label for="description">Leírás <span class="opt">(opcionális)</span></label>
-          <textarea id="description" name="description" rows="3" placeholder="Rövid leírás..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Kép</label>
-          <div class="drop-zone" id="drop-zone">
-            <input type="file" id="file" name="file" accept="image/*" required class="file-input" />
-            <div class="drop-content" id="drop-content">
-              <div class="drop-icon">⊕</div>
-              <div class="drop-text">Húzd ide a képet, vagy kattints</div>
-              <div class="drop-hint">JPG, PNG, WEBP — max. 20 MB</div>
+    <aside class="greeting">
+      <div class="greeting-inner">
+        <p class="greeting-eyebrow">40 év alkotás</p>
+        <h1>Medgyessy Ferenc<br/>Gimnázium</h1>
+        <div class="greeting-divider"></div>
+        <p>
+          Negyven évvel ezelőtt egy különleges hely született Debrecenben — olyan iskola,
+          ahol a tudás és a művészet egymást erősítve nevelnek.
+        </p>
+        <p>
+          A Medgyessy Ferenc Gimnázium Művészeti Szakgimnáziuma és Technikuma azóta is
+          az alkotás iskolája: képzőművészet, zene, tánc, mozgóképkultúra — minden
+          tantárgyban ott él a teremtés öröme.
+        </p>
+        <p>
+          Diákjaink generációi hagytak nyomot nemcsak a debreceni kulturális életen,
+          hanem az ország és a világ képzőművészetén, zenei életén is. Ezek az alkotások
+          most közös emlékezetté válnak.
+        </p>
+        <p>
+          Ez az archívum a négy évtized termésének digitális otthona — hogy az itt
+          született művek ne merüljenek feledésbe, hanem tanúsítsák: az iskola él,
+          alkot, és büszke rájuk.
+        </p>
+        <p class="greeting-year">1986 — 2026</p>
+      </div>
+    </aside>
+
+    <div class="form-column">
+      <div class="page-header">
+        <h2>Feltöltés</h2>
+        <p>Töltsd fel alkotásaidat a gimnázium digitális archívumába.</p>
+      </div>
+
+      <div id="form-wrap">
+        <form id="upload-form">
+          <div class="form-group">
+            <label for="author">Szerző neve</label>
+            <input type="text" id="author" name="author" placeholder="Teljes neved" required />
+          </div>
+          <div class="form-group">
+            <label for="email">E-mail cím</label>
+            <input type="email" id="email" name="email" placeholder="pelda@email.hu" required />
+          </div>
+          <div class="form-group">
+            <label for="description">Leírás <span class="opt">(opcionális)</span></label>
+            <textarea id="description" name="description" rows="3" placeholder="Rövid leírás..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Fájlok</label>
+            <div class="drop-zone" id="drop-zone">
+              <input type="file" id="file" name="file" multiple class="file-input" />
+              <div class="drop-content" id="drop-content">
+                <div class="drop-icon">⊕</div>
+                <div class="drop-text">Húzd ide a fájlokat, vagy kattints</div>
+                <div class="drop-hint">Képek, dokumentumok — korlátlan méret</div>
+              </div>
             </div>
+            <ul id="file-list" class="file-list"></ul>
           </div>
-          <div id="preview-wrap" style="display:none;margin-top:0.8rem;position:relative;display:none;">
-            <img id="preview-img" src="" alt="Előnézet" style="max-width:100%;max-height:260px;border:1px solid rgba(139,0,0,0.3);" />
-            <button type="button" id="remove-file" class="remove-btn">✕</button>
+          <div id="progress-wrap" style="display:none;">
+            <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+            <div id="progress-text" class="progress-text">Feltöltés...</div>
           </div>
-        </div>
-        <div id="progress-wrap" style="display:none;">
-          <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
-          <div id="progress-text" class="progress-text">Feltöltés...</div>
-        </div>
-        <button type="submit" class="submit-btn" id="submit-btn">Feltöltés</button>
-      </form>
-    </div>
+          <button type="submit" class="submit-btn" id="submit-btn">Feltöltés</button>
+        </form>
+      </div>
 
-    <div id="success" class="success" style="display:none;">
-      <div class="s-icon">✦</div>
-      <h2>Sikeresen feltöltve!</h2>
-      <p>Alkotásod megjelent a galériában.</p>
-      <div class="s-actions">
-        <a href="/galeria" class="btn-red">Megtekintés a galériában</a>
-        <button id="upload-another" class="btn-ghost">Újabb feltöltése</button>
+      <div id="success" class="success" style="display:none;">
+        <div class="s-icon">✦</div>
+        <h2>Sikeresen feltöltve!</h2>
+        <p>A fájlok és az adatok elmentve.</p>
+        <div class="s-actions">
+          <button id="upload-another" class="btn-ghost">Újabb feltöltése</button>
+        </div>
+      </div>
+
+      <div id="error-box" class="error-box" style="display:none;">
+        <span id="error-text"></span>
       </div>
     </div>
 
-    <div id="error-box" class="error-box" style="display:none;">
-      <span id="error-text"></span>
-    </div>
   </div>
 </Layout>
 
 <style>
-  .upload-page { max-width: 620px; margin: 0 auto; }
+  .page-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    align-items: start;
+  }
+  .greeting {
+    position: sticky;
+    top: 3rem;
+    padding-right: 3.5rem;
+    border-right: 1px solid rgba(139,0,0,0.35);
+  }
+  .greeting-inner {
+    padding: 2rem 2rem 2.5rem;
+    background: var(--black-card);
+    border: 1px solid rgba(139,0,0,0.2);
+    border-left: 3px solid var(--red-dim);
+  }
+  .greeting-eyebrow {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--red-bright);
+    margin-bottom: 1rem;
+  }
+  .greeting h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 0;
+  }
+  .greeting-divider {
+    width: 36px;
+    height: 2px;
+    background: var(--red);
+    margin: 1.6rem 0;
+  }
+  .greeting p {
+    color: var(--white-dim);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .greeting-year {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    color: var(--red-dim);
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+  .form-column { padding-left: 3.5rem; }
   .page-header { margin-bottom: 2.5rem; border-left: 3px solid var(--red); padding-left: 1.5rem; }
-  h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; line-height: 1.1; margin-bottom: 0.4rem; }
+  .page-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 0.3rem;
+  }
   .page-header p { color: var(--white-dim); font-style: italic; }
   .form-group { margin-bottom: 1.6rem; }
   label { display: block; font-family: 'Playfair Display', serif; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red-bright); margin-bottom: 0.5rem; }
   .opt { color: var(--white-dim); font-family: 'Crimson Pro', serif; text-transform: none; letter-spacing: 0; font-style: italic; font-size: 0.85rem; }
-  input[type="text"], textarea {
-    width: 100%; background: var(--black-card); border: 1px solid rgba(139,0,0,0.3);
+  input[type="text"], input[type="email"], textarea {
+    display: block; width: 100%; background: var(--black-card); border: 1px solid rgba(139,0,0,0.3);
     color: var(--white); padding: 0.85rem 1rem; font-family: 'Crimson Pro', serif; font-size: 1rem;
-    outline: none; transition: border-color 0.3s;
+    outline: none; transition: border-color 0.3s; box-sizing: border-box;
   }
-  input[type="text"]:focus, textarea:focus { border-color: var(--red-bright); }
+  input[type="text"]:focus, input[type="email"]:focus, textarea:focus { border-color: var(--red-bright); }
   input::placeholder, textarea::placeholder { color: rgba(176,168,152,0.35); }
   textarea { resize: vertical; }
   .drop-zone {
-    position: relative; border: 2px dashed rgba(139,0,0,0.4); background: var(--black-card);
-    padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.3s;
+    position: relative; width: 100%; border: 2px dashed rgba(139,0,0,0.4); background: var(--black-card);
+    padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.3s; box-sizing: border-box;
   }
   .drop-zone:hover, .drop-zone.over { border-color: var(--red-bright); background: rgba(139,0,0,0.05); }
   .file-input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
   .drop-icon { font-size: 2.2rem; color: var(--red-dim); margin-bottom: 0.6rem; }
   .drop-text { color: var(--white-dim); font-size: 0.95rem; }
   .drop-hint { color: rgba(176,168,152,0.45); font-size: 0.78rem; margin-top: 0.4rem; font-style: italic; }
-  .remove-btn {
-    position: absolute; top: 0.4rem; right: 0.4rem; background: rgba(0,0,0,0.8);
-    color: var(--red-bright); border: 1px solid var(--red); padding: 0.25rem 0.55rem;
-    cursor: pointer; font-size: 0.72rem;
+  :global(#file-list) {
+    list-style: none; padding: 0; margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.4rem;
   }
+  :global(#file-list li) {
+    display: flex; align-items: center;
+    background: var(--black-card); border: 1px solid rgba(139,0,0,0.3);
+    padding: 0.55rem 0.8rem;
+  }
+  :global(#file-list .fremove) {
+    background: var(--black-card); border: none; color: var(--red-dim); cursor: pointer;
+    font-family: 'Crimson Pro', serif; font-size: 1.3rem; font-weight: 400;
+    padding: 0 0.1rem; line-height: 1; flex-shrink: 0; margin-right: 0.7rem;
+    transition: color 0.2s; appearance: none; -webkit-appearance: none;
+    vertical-align: middle;
+  }
+  :global(#file-list .fremove:hover) { color: var(--red-bright); }
+  :global(#file-list .fname) { word-break: break-all; flex: 1; font-family: 'Crimson Pro', serif; font-size: 0.95rem; color: var(--white-dim); }
+  :global(#file-list .fsize) { color: rgba(176,168,152,0.45); font-family: 'Crimson Pro', serif; font-size: 0.78rem; font-style: italic; margin-left: 0.75rem; white-space: nowrap; }
   .progress-bar { height: 3px; background: rgba(139,0,0,0.2); margin-bottom: 0.5rem; }
   .progress-fill { height: 100%; background: var(--red-bright); width: 0%; transition: width 0.3s; }
   .progress-text { font-size: 0.82rem; color: var(--white-dim); font-style: italic; }
@@ -108,20 +207,20 @@ const directusUrl = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://api.mfg-art.
   .success h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; margin-bottom: 0.6rem; }
   .success p { color: var(--white-dim); font-style: italic; margin-bottom: 2rem; }
   .s-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-  .btn-red { padding: 0.75rem 1.8rem; background: var(--red); color: var(--white); text-decoration: none; font-family: 'Playfair Display', serif; letter-spacing: 0.1em; font-size: 0.88rem; transition: background 0.3s; }
-  .btn-red:hover { background: var(--red-bright); }
   .btn-ghost { padding: 0.75rem 1.8rem; background: transparent; color: var(--white-dim); border: 1px solid rgba(176,168,152,0.3); font-family: 'Playfair Display', serif; letter-spacing: 0.1em; font-size: 0.88rem; cursor: pointer; transition: all 0.3s; }
   .btn-ghost:hover { color: var(--white); border-color: var(--white-dim); }
   .error-box { background: rgba(139,0,0,0.1); border: 1px solid var(--red-dim); padding: 0.9rem 1.2rem; color: #ff7070; margin-top: 1rem; font-style: italic; font-size: 0.95rem; }
+  @media (max-width: 900px) {
+    .page-layout { grid-template-columns: 1fr; }
+    .greeting { position: static; padding-right: 0; border-right: none; border-bottom: 1px solid rgba(139,0,0,0.25); padding-bottom: 2.5rem; margin-bottom: 2.5rem; }
+    .form-column { padding-left: 0; }
+  }
 </style>
 
-<script define:vars={{ directusUrl }}>
+<script>
   const dropZone = document.getElementById('drop-zone');
   const fileInput = document.getElementById('file');
-  const dropContent = document.getElementById('drop-content');
-  const previewWrap = document.getElementById('preview-wrap');
-  const previewImg = document.getElementById('preview-img');
-  const removeBtn = document.getElementById('remove-file');
+  const fileList = document.getElementById('file-list');
   const form = document.getElementById('upload-form');
   const submitBtn = document.getElementById('submit-btn');
   const formWrap = document.getElementById('form-wrap');
@@ -133,67 +232,96 @@ const directusUrl = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://api.mfg-art.
   const progressText = document.getElementById('progress-text');
   const uploadAnother = document.getElementById('upload-another');
 
-  function showPreview(file) {
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      previewImg.src = e.target.result;
-      previewWrap.style.display = 'block';
-      dropContent.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
+  // Fájlok nyilvántartása JS tömbben (File objektumok)
+  let selectedFiles = [];
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(1) + ' MB';
   }
 
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) showPreview(fileInput.files[0]); });
+  function renderFileList() {
+    fileList.innerHTML = '';
+    selectedFiles.forEach((file, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <button type="button" class="fremove" data-i="${i}" title="Eltávolítás">×</button>
+        <span class="fname">${file.name}</span>
+        <span class="fsize">${formatSize(file.size)}</span>
+      `;
+      fileList.appendChild(li);
+    });
+    fileList.querySelectorAll('.fremove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedFiles.splice(Number(btn.dataset.i), 1);
+        renderFileList();
+      });
+    });
+  }
+
+  function addFiles(files) {
+    for (const f of files) {
+      if (!selectedFiles.some(x => x.name === f.name && x.size === f.size)) {
+        selectedFiles.push(f);
+      }
+    }
+    renderFileList();
+  }
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) addFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+  });
+
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
   dropZone.addEventListener('drop', e => {
     e.preventDefault(); dropZone.classList.remove('over');
-    const file = e.dataTransfer?.files[0];
-    if (file) { const dt = new DataTransfer(); dt.items.add(file); fileInput.files = dt.files; showPreview(file); }
-  });
-  removeBtn.addEventListener('click', () => {
-    fileInput.value = ''; previewWrap.style.display = 'none'; dropContent.style.display = 'block';
+    if (e.dataTransfer?.files.length) addFiles(Array.from(e.dataTransfer.files));
   });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
+    if (selectedFiles.length === 0) {
+      errorText.textContent = 'Válassz ki legalább egy fájlt.';
+      errorBox.style.display = 'block';
+      return;
+    }
+
     submitBtn.disabled = true;
     errorBox.style.display = 'none';
     progressWrap.style.display = 'block';
-    progressFill.style.width = '10%';
-    progressText.textContent = 'Kép feltöltése...';
 
     try {
-      const file = fileInput.files[0];
-      if (!file) throw new Error('Válassz ki egy képet.');
-      if (file.size > 20 * 1024 * 1024) throw new Error('A fájl mérete meghaladja a 20 MB-ot.');
+      const fileIds = [];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const pct = Math.round(10 + (i / selectedFiles.length) * 65);
+        progressFill.style.width = pct + '%';
+        progressText.textContent = `Fájl feltöltése (${i + 1}/${selectedFiles.length}): ${selectedFiles[i].name}`;
 
-      // 1. Kép feltöltése a /api/upload proxy-n keresztül
-      const imgForm = new FormData();
-      imgForm.append('file', file);
-      progressFill.style.width = '40%';
-
-      const imgRes = await fetch('/api/upload-image', { method: 'POST', body: imgForm });
-      if (!imgRes.ok) {
-        const err = await imgRes.json();
-        throw new Error(err.error || 'Képfeltöltés sikertelen.');
+        const fd = new FormData();
+        fd.append('file', selectedFiles[i]);
+        const res = await fetch('/api/upload-image', { method: 'POST', body: fd });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || `Feltöltés sikertelen: ${selectedFiles[i].name}`);
+        }
+        const data = await res.json();
+        fileIds.push(data.id);
       }
-      const imgData = await imgRes.json();
-      const fileId = imgData.id;
 
-      progressFill.style.width = '75%';
+      progressFill.style.width = '80%';
       progressText.textContent = 'Adatok mentése...';
 
-      // 2. Artwork bejegyzés létrehozása
       const artRes = await fetch('/api/create-artwork', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: document.getElementById('title').value.trim(),
+          email: document.getElementById('email').value.trim(),
           author: document.getElementById('author').value.trim(),
           description: document.getElementById('description').value.trim(),
-          image: fileId
+          fileIds
         })
       });
       if (!artRes.ok) {
@@ -218,9 +346,13 @@ const directusUrl = import.meta.env.PUBLIC_DIRECTUS_URL || 'https://api.mfg-art.
   });
 
   uploadAnother.addEventListener('click', () => {
-    form.reset(); fileInput.value = '';
-    previewWrap.style.display = 'none'; dropContent.style.display = 'block';
-    progressWrap.style.display = 'none'; progressFill.style.width = '0%';
-    success.style.display = 'none'; formWrap.style.display = 'block';
+    form.reset();
+    selectedFiles = [];
+    renderFileList();
+    progressWrap.style.display = 'none';
+    progressFill.style.width = '0%';
+    success.style.display = 'none';
+    formWrap.style.display = 'block';
+    errorBox.style.display = 'none';
   });
 </script>

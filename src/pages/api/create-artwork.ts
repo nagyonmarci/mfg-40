@@ -10,24 +10,29 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const body = await request.json();
-    const { title, author, description, image } = body;
+    const { email, author, description, fileIds } = body;
 
-    if (!title || !author || !image) {
+    if (!email || !author || !fileIds?.length) {
       return new Response(JSON.stringify({ error: 'Hiányzó mezők.' }), { status: 400 });
     }
 
-    const res = await fetch(`${DIRECTUS_URL}/items/artworks`, {
+    const res = await fetch(`${DIRECTUS_URL}/items/bekuldesek`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${DIRECTUS_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ title, author, description, image })
+      body: JSON.stringify({
+        email,
+        author,
+        description,
+        files: fileIds.map((id: string) => ({ directus_files_id: id }))
+      })
     });
 
     if (!res.ok) {
       const err = await res.text();
-      console.error('Directus create artwork error:', err);
+      console.error('Directus create bekuldes error:', err);
       return new Response(JSON.stringify({ error: 'Adatmentés sikertelen.' }), { status: 502 });
     }
 

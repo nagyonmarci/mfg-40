@@ -51,17 +51,17 @@ const { title } = Astro.props;
       bottom: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--red), transparent);
     }
-    header img { height: 60px; width: auto; }
-    .titles { display: flex; flex-direction: column; }
+    header img { height: 64px; width: auto; }
+    .titles { display: flex; flex-direction: column; gap: 0.15rem; }
     .school-name {
       font-family: 'Playfair Display', serif;
       font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--red-bright);
     }
-    .school-sub { font-size: 0.82rem; color: var(--white-dim); letter-spacing: 0.04em; }
+    .school-sub { font-size: 0.8rem; color: var(--white-dim); letter-spacing: 0.03em; }
     nav { display: flex; gap: 2rem; margin-left: auto; }
     nav a {
       color: var(--white-dim);
@@ -93,15 +93,14 @@ const { title } = Astro.props;
   <header>
     <img src="/logo.png" alt="Medgyessy logo" />
     <div class="titles">
-      <span class="school-name">Medgyessy Ferenc</span>
-      <span class="school-sub">Gimnázium és Művészeti Iskola · Debrecen</span>
+      <span class="school-name">Medgyessy Ferenc Gimnázium</span>
+      <span class="school-sub">Művészeti Szakgimnázium és Technikum</span>
     </div>
     <nav>
       <a href="/" class={Astro.url.pathname === '/' ? 'active' : ''}>Feltöltés</a>
-      <a href="/galeria" class={Astro.url.pathname === '/galeria' ? 'active' : ''}>Galéria</a>
     </nav>
   </header>
   <main><slot /></main>
-  <footer>© {new Date().getFullYear()} Medgyessy Ferenc Gimnázium és Művészeti Iskola, Debrecen</footer>
+  <footer>© {new Date().getFullYear()} Medgyessy Ferenc Gimnázium Művészeti Szakgimnázium és Technikum, Debrecen</footer>
 </body>
 </html>

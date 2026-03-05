@@ -16,14 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Nincs fájl.' }), { status: 400 });
     }
 
-    if (file.size > 20 * 1024 * 1024) {
-      return new Response(JSON.stringify({ error: 'A fájl mérete meghaladja a 20 MB-ot.' }), { status: 400 });
-    }
 
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowed.includes(file.type)) {
-      return new Response(JSON.stringify({ error: 'Csak képfájlok engedélyezettek.' }), { status: 400 });
-    }
 
     const df = new FormData();
     df.append('file', file);
