@@ -32,9 +32,9 @@ services:
       DB_DATABASE: ${DB_NAME:-mfg}
       DB_USER: ${DB_USER:-mfg}
       DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@mfg-art.hu}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?ADMIN_EMAIL is required}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
-      PUBLIC_URL: https://api.mfg-art.hu
+      PUBLIC_URL: https://mfg-art.hu
       STORAGE_LOCATIONS: local
       STORAGE_LOCAL_ROOT: /directus/uploads
       CORS_ENABLED: "true"
@@ -47,10 +47,12 @@ services:
       - traefik_proxy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mfg-directus.rule=Host(`api.mfg-art.hu`)"
+      # Directus path-alapú routing a fődomainon (magasabb prioritás mint Astro)
+      - "traefik.http.routers.mfg-directus.rule=Host(`mfg-art.hu`) && (PathPrefix(`/admin`) || PathPrefix(`/assets`) || PathPrefix(`/auth`) || PathPrefix(`/users`) || PathPrefix(`/roles`) || PathPrefix(`/policies`) || PathPrefix(`/items`) || PathPrefix(`/files`) || PathPrefix(`/folders`) || PathPrefix(`/collections`) || PathPrefix(`/fields`) || PathPrefix(`/relations`) || PathPrefix(`/permissions`) || PathPrefix(`/settings`) || PathPrefix(`/server`) || PathPrefix(`/extensions`) || PathPrefix(`/utils`) || PathPrefix(`/flows`) || PathPrefix(`/operations`) || PathPrefix(`/shares`) || PathPrefix(`/activity`) || PathPrefix(`/versions`))"
       - "traefik.http.routers.mfg-directus.entrypoints=websecure"
       - "traefik.http.routers.mfg-directus.tls=true"
       - "traefik.http.routers.mfg-directus.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mfg-directus.priority=10"
       - "traefik.http.services.mfg-directus.loadbalancer.server.port=8055"
       - "traefik.docker.network=traefik_proxy"
 
@@ -68,7 +70,7 @@ services:
       - HOST=0.0.0.0
       - PORT=3000
       - DIRECTUS_URL=http://mfg-directus:8055
-      - PUBLIC_DIRECTUS_URL=https://api.mfg-art.hu
+      - PUBLIC_DIRECTUS_URL=https://mfg-art.hu
       - DIRECTUS_TOKEN=${DIRECTUS_TOKEN:?DIRECTUS_TOKEN is required}
     networks:
       - mfg_internal
@@ -86,6 +88,7 @@ services:
       - "traefik.http.routers.mfg.entrypoints=websecure"
       - "traefik.http.routers.mfg.tls=true"
       - "traefik.http.routers.mfg.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.mfg.priority=1"
       - "traefik.http.services.mfg.loadbalancer.server.port=3000"
       - "traefik.docker.network=traefik_proxy"
 

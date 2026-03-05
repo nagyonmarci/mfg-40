@@ -46,7 +46,7 @@ docker exec mfg-directus sh /tmp/setup-directus.sh
 
 ### 5. API Token létrehozása
 
-1. Nyisd meg: `https://api.mfg-art.hu/admin`
+1. Nyisd meg: `https://mfg-art.hu/admin`
 2. Jelentkezz be az `ADMIN_EMAIL` / `ADMIN_PASSWORD` értékekkel (lásd `.env`)
 3. **Settings → API Tokens → Add Token**
 4. Név: `astro`, Role: `Administrator`
@@ -86,7 +86,7 @@ scripts/
 
 ## Helyi fejlesztés
 
-A `docker-compose.override.yml` felülírja a production konfigurációt helyi futtatáshoz (port 8056, CORS localhost).
+A `docker-compose.override.yml` felülírja a production konfigurációt helyi futtatáshoz (port 8056, CORS localhost). Helyi futtatásnál a Directus admin: `http://localhost:8056/admin`
 
 ```bash
 docker compose up -d mfg-db mfg-directus
