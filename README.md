@@ -86,10 +86,10 @@ scripts/
 
 ## Helyi fejlesztés
 
-A `docker-compose.override.yml` felülírja a production konfigurációt helyi futtatáshoz (port 8056, CORS localhost). Helyi futtatásnál a Directus admin: `http://localhost:8056/admin`
+A `docker-compose.local.yml` felülírja a production konfigurációt helyi futtatáshoz (port 8056, CORS localhost). **Nem töltődik be automatikusan** — explicit kell megadni. Helyi Directus admin: `http://localhost:8056/admin`
 
 ```bash
-docker compose up -d mfg-db mfg-directus
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d mfg-db mfg-directus
 # Várj ~30mp-et, majd:
 docker cp scripts/setup-directus.sh mfg-directus:/tmp/setup-directus.sh
 docker exec mfg-directus sh /tmp/setup-directus.sh
