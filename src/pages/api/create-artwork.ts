@@ -16,8 +16,8 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Hiányzó mezők.' }), { status: 400 });
     }
 
-    // 1. bekuldesek rekord létrehozása (files nélkül)
-    const res = await fetch(`${DIRECTUS_URL}/items/bekuldesek`, {
+    // 1. bekuldesek rekord létrehozása (files nélkül, csak id-t kérünk vissza)
+    const res = await fetch(`${DIRECTUS_URL}/items/bekuldesek?fields[]=id`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${DIRECTUS_TOKEN}`,
