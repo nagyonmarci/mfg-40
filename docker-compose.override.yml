@@ -1,4 +1,4 @@
-# Lokális fejlesztési felülírások (NEM commitolni production-ba)
+# Lokális fejlesztési felülírások — csak helyi futtatáshoz
 services:
   mfg-directus:
     environment:

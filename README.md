@@ -1,8 +1,8 @@
-# MFG-40 — Medgyessy Gimnázium Képfeltöltő
+# MFG-40 — Medgyessy Gimnázium Digitális Archívum
 
-Astro frontend + Directus CMS backend.
+Astro frontend + Directus CMS backend. Minden érzékeny adat a `.env` fájlban van (lásd `.env.example`).
 
-- **mfg-art.hu** → Astro feltöltő + galéria
+- **mfg-art.hu** → Astro feltöltő oldal
 - **api.mfg-art.hu** → Directus admin + API
 
 ## Deploy lépései
@@ -21,7 +21,7 @@ cp .env.example .env
 nano .env
 ```
 
-Töltsd ki az összes értéket (DB_PASSWORD, DIRECTUS_SECRET, ADMIN_PASSWORD).
+Töltsd ki az összes értéket (`DB_PASSWORD`, `DIRECTUS_SECRET`, `ADMIN_PASSWORD`).
 A `DIRECTUS_TOKEN`-t egyelőre hagyd üresen.
 
 ### 3. Directus + DB indítása
@@ -38,20 +38,20 @@ docker logs mfg-directus --tail 20
 ### 4. Directus setup (collection + jogosultságok)
 
 ```bash
-bash scripts/setup-directus.sh
+ADMIN_PASSWORD=$(grep ADMIN_PASSWORD .env | cut -d= -f2) bash scripts/setup-directus.sh
 ```
 
 ### 5. API Token létrehozása
 
 1. Nyisd meg: `https://api.mfg-art.hu/admin`
-2. Jelentkezz be az ADMIN_EMAIL / ADMIN_PASSWORD-dal
+2. Jelentkezz be az `ADMIN_EMAIL` / `ADMIN_PASSWORD` értékekkel (lásd `.env`)
 3. **Settings → API Tokens → Add Token**
 4. Név: `astro`, Role: `Administrator`
-5. Másold a tokent
+5. Másold a tokent a `.env` fájlba:
 
 ```bash
 nano .env
-# DIRECTUS_TOKEN=ide_a_token
+# DIRECTUS_TOKEN=<token>
 ```
 
 ### 6. Astro indítása
@@ -71,13 +71,23 @@ docker compose up -d --build mfg-astro
 
 ```
 src/pages/
-  index.astro          # Feltöltő oldal
-  galeria.astro        # Galéria lightboxszal
+  index.astro          # Feltöltő oldal (kétoszlopos, köszöntő + form)
   api/
     upload-image.ts    # Proxy → Directus /files
-    create-artwork.ts  # Proxy → Directus /items/artworks
+    create-artwork.ts  # Proxy → Directus /items/bekuldesek
 src/layouts/
   Layout.astro         # Közös dark/red design
 scripts/
-  setup-directus.sh    # Egyszeri setup script
+  setup-directus.sh    # Egyszeri Directus inicializálás
+```
+
+## Helyi fejlesztés
+
+A `docker-compose.override.yml` felülírja a production konfigurációt helyi futtatáshoz (port 8056, CORS localhost).
+
+```bash
+docker compose up -d mfg-db mfg-directus
+ADMIN_PASSWORD=$(grep ADMIN_PASSWORD .env | cut -d= -f2) \
+  DIRECTUS_URL=http://localhost:8056 bash scripts/setup-directus.sh
+DIRECTUS_URL=http://localhost:8056 npm run dev
 ```
