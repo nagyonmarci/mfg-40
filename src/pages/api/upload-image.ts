@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://mfg-directus:8055';
-const DIRECTUS_TOKEN = import.meta.env.DIRECTUS_TOKEN;
+const DIRECTUS_URL = process.env.DIRECTUS_URL || 'http://mfg-directus:8055';
+const DIRECTUS_TOKEN = process.env.DIRECTUS_TOKEN;
 
 export const POST: APIRoute = async ({ request }) => {
   try {
