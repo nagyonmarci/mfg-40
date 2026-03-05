@@ -42,6 +42,20 @@ async function tryOrSkip(label, fn) {
 }
 
 // 1. Login
+// Várakozás amíg Directus elindul
+console.log('Várakozás a Directus indulására...');
+let ready = false;
+for (let i = 0; i < 30; i++) {
+  try {
+    const h = await fetch(`${base}/server/health`);
+    if (h.ok) { ready = true; break; }
+  } catch {}
+  process.stdout.write(`  ${i + 1}/30...\r`);
+  await new Promise(r => setTimeout(r, 2000));
+}
+if (!ready) { console.error('Directus nem indult el 60 másodpercen belül.'); process.exit(1); }
+console.log('  ✓ Directus fut.                ');
+
 console.log('Bejelentkezés...');
 const login = await api('/auth/login', 'POST', { email, password });
 const token = login.data?.access_token;
